@@ -36,6 +36,7 @@ export interface Location {
 }
 
 export interface User {
+    id: string,
     name: string
     image: string
 }
@@ -53,6 +54,7 @@ export interface Boundary {
 }
 
 export type Mate = {
+    id: string,
     name: string
     avatar: string
     pos: Position

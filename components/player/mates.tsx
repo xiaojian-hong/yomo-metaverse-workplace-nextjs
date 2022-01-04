@@ -14,7 +14,8 @@ const Mates = ({ socket }: { socket: Socket }) => {
         <>
             {mates.map(m => (
                 <Mate
-                    key={m.name}
+                    key={m.id}
+                    id={m.id}
                     name={m.name}
                     avatar={m.avatar}
                     initPos={m.pos}

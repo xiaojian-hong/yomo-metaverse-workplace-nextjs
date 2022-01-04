@@ -73,6 +73,7 @@ const Scene = ({
                 <div className='relative w-full h-full sm:h-auto sm:pb-10 sm-grid'>
                     <Mates socket={socket} />
                     <Me
+                        id={me.id}
                         name={me.name}
                         avatar={me.image}
                         initPos={playerInitialPosition}

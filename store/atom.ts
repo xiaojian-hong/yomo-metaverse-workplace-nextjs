@@ -31,6 +31,7 @@ export const locationState = atom({
 export const meState = atom({
     key: 'meState',
     default: {
+        id: '',
         name: '',
         image: '',
     },

@@ -2,6 +2,7 @@ import '../styles/global.css'
 
 import { useState, useEffect } from 'react'
 import { useSession, signIn } from 'next-auth/client'
+import { v4 as uuidv4 } from 'uuid';
 
 import { RecoilRoot, useSetRecoilState } from 'recoil'
 import { smallDeviceState, scaleState, meState } from '../store/atom'
@@ -66,6 +67,7 @@ function Auth({ children }: { children: JSX.Element }) {
     useEffect(() => {
         if (process.env.NODE_ENV == 'development') {
             setDeveloper({
+                id: uuidv4(),
                 name: `developer${new Date().getSeconds() % 9}`,
                 image: `./avatar.png`,
             })
@@ -88,7 +90,9 @@ function Auth({ children }: { children: JSX.Element }) {
                 if (old.name === user?.name) {
                     return old
                 }
+                console.log(user);
                 return {
+                    id: user.id,
                     name: user.name,
                     image: user.image,
                 }

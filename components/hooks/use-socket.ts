@@ -25,7 +25,7 @@ export default function useSocket({
     const setOnlineState = useSetRecoilState(onlineState)
 
     useEffect(() => {
-        if (!me.name) {
+        if (!me.id) {
             return
         }
 
@@ -40,56 +40,56 @@ export default function useSocket({
             autoConnect: false,
         })
 
-        // `online` event will be occured when user is connected to websocket
-        socket.on('online', mate => {
-            log.log('[online]', mate.name)
-            if (mate.name === me.name) {
-                log.log('[online] is Me, ignore', me.name)
+        // `enter` event will be occured when user is connected to websocket
+        socket.on('playerJoins', mate => {
+            log.log('[playerJoins]', mate)
+            if (mate.id === me.id) {
+                log.log('[online] is Me, ignore', me.id, me.name)
                 return
             }
 
             setMateMapState(old => {
-                if (old.has(mate.name)) {
+                if (old.has(mate.id)) {
                     return old
                 }
 
                 mate.pos = new Vector(position.x, position.y)
                 const mateMap = new Map(old)
-                mateMap.set(mate.name, mate)
+                mateMap.set(mate.id, mate)
                 return mateMap
             })
         })
 
         // `offline` event will be occured when other users leave
-        socket.on('offline', mate => {
-            log.log('[offline]', mate.name)
+        socket.on('playerExits', payload => {
+            log.log('[playerExits]', payload.id)
             setMateMapState(old => {
                 const mateMap = new Map(old)
-                mateMap.delete(mate.name)
+                mateMap.delete(payload.id)
                 return mateMap
             })
 
             setMatePositionMapState(old => {
                 const matePositionMap = new Map(old)
-                matePositionMap.delete(mate.name)
+                matePositionMap.delete(payload.id)
                 return matePositionMap
             })
         })
 
-        socket.on('sync', state => {
-            log.log('[sync]', state, ', Me:', me.name)
-            if (state.name === me.name) {
-                log.log('[sync] is Me, ignore', me.name)
+        socket.on('playerSync', state => {
+            log.log('[playerSync]', state, ', Me:', me.id)
+            if (state.id === me.id) {
+                log.log('[playerSync] is Me, ignore', me.id)
                 return
             }
 
             setMateMapState(old => {
-                if (old.has(state.name)) {
+                if (old.has(state.id)) {
                     return old
                 }
 
                 const mateMap = new Map(old)
-                mateMap.set(state.name, state)
+                mateMap.set(state.od, state)
                 return mateMap
             })
         })
@@ -97,7 +97,7 @@ export default function useSocket({
         // broadcast to others I am online when WebSocket connected
         socket.on('connect', () => {
             // log.log('WS CONNECTED', socket.id, socket.connected)
-            socket.emit('online', { room, name: me.name, avatar: me.image })
+            socket.emit('enter', { space: room, id: me.id, name: me.name, avatar: me.image })
             setOnlineState(true)
         })
 
@@ -116,7 +116,7 @@ export default function useSocket({
             setMateMapState(new Map())
             socket.disconnect('bye')
         }
-    }, [me.name])
+    }, [me.id])
 
     return socket
 }

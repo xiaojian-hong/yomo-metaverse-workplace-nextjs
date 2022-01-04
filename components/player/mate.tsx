@@ -14,11 +14,13 @@ import type { Socket } from 'socket.io-client'
 import type { Position } from '../../types'
 
 const Mate = ({
+    id,
     name,
     avatar,
     initPos,
     socket,
 }: {
+    id: string,
     name: string
     avatar: string
     initPos: Position
@@ -54,7 +56,7 @@ const Mate = ({
 
             setMatePositionMapState(old => {
                 const matePositionMap = new Map(old)
-                matePositionMap.set(name, {
+                matePositionMap.set(id, {
                     x: POS.x,
                     y: POS.y,
                 })
@@ -63,8 +65,8 @@ const Mate = ({
         }
 
         const direction$ = new Observable<Vector>(obs => {
-            socket.on('movement', mv => {
-                if (mv.name != name || isMobile) {
+            socket.on('playerMoves', mv => {
+                if (mv.id != id || isMobile) {
                     return
                 }
 
@@ -80,7 +82,7 @@ const Mate = ({
 
                 setMatePositionMapState(old => {
                     const matePositionMap = new Map(old)
-                    matePositionMap.set(name, {
+                    matePositionMap.set(id, {
                         x: currPos.x,
                         y: currPos.y,
                     })

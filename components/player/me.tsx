@@ -51,6 +51,7 @@ const boundaryProcess = (currPosAndDir: CurrentPositionAndDirection, boundary: B
 }
 
 const Me = ({
+    id,
     name,
     avatar,
     initPos,
@@ -58,6 +59,7 @@ const Me = ({
     channel,
     boundary,
 }: {
+    id: string,
     name: string
     avatar: string
     initPos: Position
@@ -96,12 +98,12 @@ const Me = ({
         // this is the response
         socket.on('ask', () => {
             log.log('[ask], response as', name, 'avatar:', avatar)
-            socket.emit('sync', { name: name, pos: POS, avatar: avatar })
+            socket.emit('sync', { id, name, pos: POS, avatar: avatar })
         })
 
-        // TODO：Broadcast movement event streams to others in this game room
+        // TODO：Broadcast move event streams to others in this game room
         const broadcastEvent = (dir: Vector) => {
-            socket.emit('movement', { dir })
+            socket.emit('move', { dir })
         }
 
         // keyboard `keypress` event, we use keyboard to control moving actions
