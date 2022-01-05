@@ -9,6 +9,7 @@ import { Logger } from '../../libs/helper'
 import io from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
 import type { User, Position } from '../../types'
+import mate from '../player/mate'
 
 export default function useSocket({
     me,
@@ -40,7 +41,7 @@ export default function useSocket({
             autoConnect: false,
         })
 
-        // `enter` event will be occured when user is connected to websocket
+        // `playerJoins` event will be occured when user is connected to websocket
         socket.on('playerJoins', mate => {
             log.log('[playerJoins]', mate)
             if (mate.id === me.id) {
@@ -60,7 +61,7 @@ export default function useSocket({
             })
         })
 
-        // `offline` event will be occured when other users leave
+        // `playerExits` event will be occured when other users leave
         socket.on('playerExits', payload => {
             log.log('[playerExits]', payload.id)
             setMateMapState(old => {
@@ -76,6 +77,7 @@ export default function useSocket({
             })
         })
 
+        // `playerSync` event will be occured when new player joins
         socket.on('playerSync', state => {
             log.log('[playerSync]', state, ', Me:', me.id)
             if (state.id === me.id) {
@@ -89,7 +91,7 @@ export default function useSocket({
                 }
 
                 const mateMap = new Map(old)
-                mateMap.set(state.od, state)
+                mateMap.set(state.id, state)
                 return mateMap
             })
         })

@@ -4,8 +4,8 @@ import { scan } from 'rxjs/operators'
 
 import Sound from '../rtc/sound'
 
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { trackMapState, matePositionMapState } from '../../store/atom'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { trackMapState, matePositionMapState, myLatencyState } from '../../store/atom'
 
 import { Vector } from '../../libs/movement'
 import { checkMobileDevice } from '../../libs/helper'
@@ -28,6 +28,7 @@ const Mate = ({
 }) => {
     const refContainer = useRef<HTMLDivElement>(null)
     const trackMap = useRecoilValue(trackMapState)
+    const [latency, setLatency] = useRecoilState(myLatencyState);
     const { videoTrack, audioTrack } = trackMap.get(name) || {
         videoTrack: null,
         audioTrack: null,
@@ -97,6 +98,19 @@ const Mate = ({
             }
         }, 1000)
 
+
+
+        // `playerLatency` event will be occured when the player wants to sync the latency to others.
+        socket.on('playerLatency', state => {
+            if (state.id != id) {
+                return
+            }
+
+            if (state.latency) {
+                setLatency(state.latency)
+            }
+        })
+
         return () => {
             subscription.unsubscribe()
         }
@@ -125,6 +139,7 @@ const Mate = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
+            { latency  ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{latency} ms</div> : null }
         </div>
     )
 }

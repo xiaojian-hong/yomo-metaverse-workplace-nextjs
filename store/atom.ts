@@ -37,6 +37,11 @@ export const meState = atom({
     },
 })
 
+export const myLatencyState = atom({
+    key: 'myLatencyState',
+    default: 0,
+})
+
 export const mateMapState = atom({
     key: 'mateMapState',
     default: new Map<string, Mate>(),

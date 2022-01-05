@@ -4,8 +4,8 @@ import { map, filter, scan, auditTime } from 'rxjs/operators'
 
 import Webcam from '../rtc/webcam'
 
-import { useSetRecoilState } from 'recoil'
-import { mePositionState } from '../../store/atom'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { mePositionState, myLatencyState } from '../../store/atom'
 
 import { Vector, move, keyPressWASD } from '../../libs/movement'
 import { Logger, checkMobileDevice } from '../../libs/helper'
@@ -70,6 +70,7 @@ const Me = ({
     const refContainer = useRef<HTMLDivElement>(null)
 
     const setMePositionState = useSetRecoilState(mePositionState)
+    const [myLatency, setMyLatency] = useRecoilState(myLatencyState);
 
     useEffect(() => {
         const log = new Logger('Me', 'color: white; background: green')
@@ -100,6 +101,25 @@ const Me = ({
             log.log('[ask], response as', name, 'avatar:', avatar)
             socket.emit('sync', { id, name, pos: POS, avatar: avatar })
         })
+
+        // Send `ping` event to server
+        socket.emit('ping', { timestamp:  Date.now()})
+        // Then re-end `ping` event in every 30s.
+        setInterval(() => {
+            socket.emit('ping', { timestamp:  Date.now()})
+        }, 10000)
+
+        // Receive `pong` event and calculate the latency.
+        socket.on('pong', (payload) => {
+            if (payload && payload.timestamp) {
+                const rtt = Date.now() - payload.timestamp
+                const latency = rtt / 2
+                setMyLatency(latency)
+                socket.emit('latency', {
+                    latency,
+                })
+            }
+        });
 
         // TODO：Broadcast move event streams to others in this game room
         const broadcastEvent = (dir: Vector) => {
@@ -165,6 +185,7 @@ const Me = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
+            { myLatency  ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{myLatency} ms</div> : null }
         </div>
     )
 }
