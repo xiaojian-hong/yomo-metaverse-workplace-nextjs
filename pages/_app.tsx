@@ -90,9 +90,8 @@ function Auth({ children }: { children: JSX.Element }) {
                 if (old.name === user?.name) {
                     return old
                 }
-                console.log(user);
                 return {
-                    id: user.id,
+                    id: user.id || user.name,
                     name: user.name,
                     image: user.image,
                 }

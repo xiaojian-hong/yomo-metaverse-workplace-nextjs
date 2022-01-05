@@ -36,4 +36,12 @@ export default NextAuth({
         }),
     ],
     theme: 'light',
+    callbacks: {
+        session: async (session, user: User) => {
+            if (session.user && user.id) {
+                session.user.id = user.id
+            }
+            return Promise.resolve(session)
+        },
+    },
 })
