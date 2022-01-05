@@ -1,11 +1,11 @@
-import { useEffect, useRef, memo } from 'react'
+import { useEffect, useRef, memo, useState } from 'react'
 import { Observable } from 'rxjs'
 import { scan } from 'rxjs/operators'
 
 import Sound from '../rtc/sound'
 
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { trackMapState, matePositionMapState, myLatencyState } from '../../store/atom'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { trackMapState, matePositionMapState } from '../../store/atom'
 
 import { Vector } from '../../libs/movement'
 import { checkMobileDevice } from '../../libs/helper'
@@ -28,7 +28,7 @@ const Mate = ({
 }) => {
     const refContainer = useRef<HTMLDivElement>(null)
     const trackMap = useRecoilValue(trackMapState)
-    const [latency, setLatency] = useRecoilState(myLatencyState);
+    const [mateLatency, setMateLatency] = useState({ latency: 0, mesh_id: '' });
     const { videoTrack, audioTrack } = trackMap.get(name) || {
         videoTrack: null,
         audioTrack: null,
@@ -107,7 +107,7 @@ const Mate = ({
             }
 
             if (state.latency) {
-                setLatency(state.latency)
+                setMateLatency({latency: state.latency, mesh_id: state.mesh_id })
             }
         })
 
@@ -139,7 +139,7 @@ const Mate = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
-            { latency  ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{latency} ms</div> : null }
+            { mateLatency && mateLatency.latency > 0 ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{mateLatency.latency}ms ({mateLatency.mesh_id})</div> : null }
         </div>
     )
 }

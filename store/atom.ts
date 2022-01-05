@@ -39,7 +39,10 @@ export const meState = atom({
 
 export const myLatencyState = atom({
     key: 'myLatencyState',
-    default: 0,
+    default: {
+        latency: 0,
+        mesh_id: '',
+    },
 })
 
 export const mateMapState = atom({

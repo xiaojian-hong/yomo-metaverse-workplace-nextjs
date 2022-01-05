@@ -3,23 +3,23 @@ import countryRegion from '../libs/amesh.json'
 
 export async function middleware(req: NextRequest) {
     const { nextUrl: url, geo } = req
-    const country = geo.country
+    const country = url.searchParams.get('country') || geo.country
     const mesh = getMeshID(country)
 
     url.searchParams.set('country', country as string)
-    url.searchParams.set('region', mesh)
+    url.searchParams.set('region', mesh || '')
 
     return NextResponse.rewrite(url)
 }
 
 // 4 mesh nodes
-function getMeshID(country: string | undefined): string {
+function getMeshID(country: string | undefined): string | undefined {
     if (country == undefined) {
-        return 'us.x.yomo.dev'
+        return process.env.NEXT_PUBLIC_WEBSOCKET_URL_US
     }
 
     if (country === 'CN') {
-        return 'cn1.x.yomo.dev'
+        return process.env.NEXT_PUBLIC_WEBSOCKET_URL_CN
     }
 
     const res = countryRegion.find((item: { name: string; region: string }) => {
@@ -29,15 +29,15 @@ function getMeshID(country: string | undefined): string {
     })
 
     if (!res) {
-        return 'us.x.yomo.dev'
+        return process.env.NEXT_PUBLIC_WEBSOCKET_URL_US
     }
 
     switch (res.region) {
         case 'Asia':
-            return 'sg.x.yomo.dev'
+            return process.env.NEXT_PUBLIC_WEBSOCKET_URL_KR
         case 'Europe':
-            return 'de.x.yomo.dev'
+            return process.env.NEXT_PUBLIC_WEBSOCKET_URL_DE
         default:
-            return 'us.x.yomo.dev'
+            return process.env.NEXT_PUBLIC_WEBSOCKET_URL_US
     }
 }

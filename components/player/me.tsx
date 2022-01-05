@@ -114,9 +114,13 @@ const Me = ({
             if (payload && payload.timestamp) {
                 const rtt = Date.now() - payload.timestamp
                 const latency = rtt / 2
-                setMyLatency(latency)
+                setMyLatency({
+                    latency,
+                    mesh_id: payload.mesh_id,
+                })
                 socket.emit('latency', {
                     latency,
+                    mesh_id: payload.mesh_id,
                 })
             }
         });
@@ -185,7 +189,7 @@ const Me = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
-            { myLatency  ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{myLatency} ms</div> : null }
+            { myLatency && myLatency.latency > 0 && <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{myLatency.latency}ms ({myLatency.mesh_id})</div> }
         </div>
     )
 }

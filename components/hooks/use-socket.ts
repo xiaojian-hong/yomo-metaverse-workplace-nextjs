@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { useSetRecoilState } from 'recoil'
-import { mateMapState, matePositionMapState, onlineState } from '../../store/atom'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { locationState, mateMapState, matePositionMapState, onlineState } from '../../store/atom'
 
 import { Vector } from '../../libs/movement'
 import { Logger } from '../../libs/helper'
@@ -9,7 +9,6 @@ import { Logger } from '../../libs/helper'
 import io from 'socket.io-client'
 import type { Socket } from 'socket.io-client'
 import type { User, Position } from '../../types'
-import mate from '../player/mate'
 
 export default function useSocket({
     me,
@@ -24,6 +23,7 @@ export default function useSocket({
     const setMateMapState = useSetRecoilState(mateMapState)
     const setMatePositionMapState = useSetRecoilState(matePositionMapState)
     const setOnlineState = useSetRecoilState(onlineState)
+    const location = useRecoilValue(locationState)
 
     useEffect(() => {
         if (!me.id) {
@@ -33,7 +33,7 @@ export default function useSocket({
         const log = new Logger('Scene', 'color: green; background: yellow')
 
         // init socket.io client
-        const socket: Socket = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL, {
+        const socket: Socket = io(location.region, {
             transports: ['websocket'],
             reconnection: true,
             reconnectionDelayMax: 10000,
