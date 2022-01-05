@@ -104,10 +104,10 @@ const Me = ({
 
         // Send `ping` event to server
         socket.emit('ping', { timestamp:  Date.now()})
-        // Then re-end `ping` event in every 30s.
+        // Then re-end `ping` event in every 5s.
         setInterval(() => {
             socket.emit('ping', { timestamp:  Date.now()})
-        }, 10000)
+        }, 5000)
 
         // Receive `pong` event and calculate the latency.
         socket.on('pong', (payload) => {
