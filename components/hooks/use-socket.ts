@@ -54,7 +54,13 @@ export default function useSocket({
                     return old
                 }
 
+                // position
                 mate.pos = new Vector(position.x, position.y)
+                // e2e latency
+                if (mate.timestamp) {
+                    mate.e2e_latency = Date.now() - mate.timestamp
+                }
+
                 const mateMap = new Map(old)
                 mateMap.set(mate.id, mate)
                 return mateMap
@@ -90,6 +96,10 @@ export default function useSocket({
                     return old
                 }
 
+                // e2e latency
+                if (state.timestamp) {
+                    state.e2e_latency = Date.now() - state.timestamp
+                }
                 const mateMap = new Map(old)
                 mateMap.set(state.id, state)
                 return mateMap
@@ -99,7 +109,7 @@ export default function useSocket({
         // broadcast to others I am online when WebSocket connected
         socket.on('connect', () => {
             // log.log('WS CONNECTED', socket.id, socket.connected)
-            socket.emit('enter', { space: room, id: me.id, name: me.name, avatar: me.image })
+            socket.emit('enter', { space: room, id: me.id, name: me.name, avatar: me.image, timestamp: Date.now() })
             setOnlineState(true)
         })
 

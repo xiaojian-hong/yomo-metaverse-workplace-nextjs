@@ -99,7 +99,7 @@ const Me = ({
         // this is the response
         socket.on('ask', () => {
             log.log('[ask], response as', name, 'avatar:', avatar)
-            socket.emit('sync', { id, name, pos: POS, avatar: avatar })
+            socket.emit('sync', { id, name, pos: POS, avatar: avatar, timestamp: Date.now() })
         })
 
         // Send `ping` event to server
@@ -127,7 +127,7 @@ const Me = ({
 
         // TODO：Broadcast move event streams to others in this game room
         const broadcastEvent = (dir: Vector) => {
-            socket.emit('move', { dir })
+            socket.emit('move', { dir, timestamp: Date.now() })
         }
 
         // keyboard `keypress` event, we use keyboard to control moving actions
@@ -189,7 +189,7 @@ const Me = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
-            { myLatency && myLatency.latency > 0 && <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{myLatency.latency}ms ({myLatency.mesh_id})</div> }
+            { myLatency && myLatency.latency > 0 && <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>Edge node: {myLatency.mesh_id} ({myLatency.latency}ms)</div> }
         </div>
     )
 }

@@ -29,6 +29,7 @@ const Mate = ({
     const refContainer = useRef<HTMLDivElement>(null)
     const trackMap = useRecoilValue(trackMapState)
     const [mateLatency, setMateLatency] = useState({ latency: 0, mesh_id: '' });
+    const [e2eLatency, setE2eLatency] = useState(0);
     const { videoTrack, audioTrack } = trackMap.get(name) || {
         videoTrack: null,
         audioTrack: null,
@@ -69,6 +70,10 @@ const Mate = ({
             socket.on('playerMoves', mv => {
                 if (mv.id != id || isMobile) {
                     return
+                }
+
+                if (mv.timestamp) {
+                    setE2eLatency(Date.now() - mv.timestamp)
                 }
 
                 obs.next(mv.dir)
@@ -139,7 +144,8 @@ const Mate = ({
             <div className='absolute top-32 left-1/2 transform -translate-x-1/2 text-base text-white font-bold whitespace-nowrap sm:top-28'>
                 {name}
             </div>
-            { mateLatency && mateLatency.latency > 0 ? <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>{mateLatency.latency}ms ({mateLatency.mesh_id})</div> : null }
+            { mateLatency && mateLatency.latency > 0 && <div className='absolute top-36 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-30'>Edge node: {mateLatency.mesh_id} ({mateLatency.latency}ms)</div>}
+            { e2eLatency > 0 && <div className='absolute top-40 left-1/2 transform -translate-x-1/2 text-base text-green-600 font-bold whitespace-nowrap sm:top-32'>E2e latency: {e2eLatency}ms</div>}
         </div>
     )
 }
